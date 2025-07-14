@@ -51,6 +51,7 @@ const products: Product[] = [
 
 const Index = () => {
   const [customerName, setCustomerName] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const { toast } = useToast();
@@ -117,6 +118,15 @@ const Index = () => {
       return;
     }
 
+    if (!customerAddress.trim()) {
+      toast({
+        title: "Please enter your address",
+        description: "We need your delivery address to process the order.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     if (orderItems.length === 0) {
       toast({
         title: "No items selected",
@@ -139,6 +149,7 @@ const Index = () => {
         return `• ${item.product.name} - ${item.quantity} ${item.selectedUnit} @ ₹${pricePerSelectedUnit.toFixed(2)}/${item.selectedUnit} = ₹${totalPrice.toFixed(2)}`;
       }).join('\n') +
       `\n\n*Total Amount: ₹${getTotalAmount().toFixed(2)}*\n\n` +
+      `📍 *Delivery Address:*\n${customerAddress}\n\n` +
       `Please confirm the order and let me know the delivery time.\n\n` +
       `Customer: ${customerName}`;
 
@@ -188,6 +199,15 @@ const Index = () => {
                   placeholder="Enter your full name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">Delivery Address</label>
+                <Input
+                  placeholder="Enter your complete address"
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
                   className="w-full"
                 />
               </div>
