@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ShoppingCart, Phone, MapPin, Clock, Plus, Minus, Star } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ShoppingCart, Phone, MapPin, Clock, Star } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import heroImage from "@/assets/kirana-hero.jpg";
 
@@ -16,26 +17,36 @@ interface Product {
   category: string;
   inStock: boolean;
   rating: number;
+  availableUnits: string[];
 }
 
 interface OrderItem {
   product: Product;
   quantity: number;
+  selectedUnit: string;
 }
 
+// Unit conversion factors (base unit prices are in kg/L)
+const unitConversions: { [key: string]: number } = {
+  'kg': 1,
+  'gram': 1000,
+  'L': 1,
+  'ml': 1000
+};
+
 const products: Product[] = [
-  { id: 1, name: "Basmati Rice", price: 120, unit: "kg", category: "Grains", inStock: true, rating: 4.5 },
-  { id: 2, name: "Whole Wheat Flour", price: 45, unit: "kg", category: "Grains", inStock: true, rating: 4.3 },
-  { id: 3, name: "Toor Dal", price: 85, unit: "kg", category: "Pulses", inStock: true, rating: 4.4 },
-  { id: 4, name: "Refined Oil", price: 110, unit: "L", category: "Oils", inStock: true, rating: 4.2 },
-  { id: 5, name: "Onions", price: 25, unit: "kg", category: "Vegetables", inStock: true, rating: 4.1 },
-  { id: 6, name: "Potatoes", price: 20, unit: "kg", category: "Vegetables", inStock: true, rating: 4.0 },
-  { id: 7, name: "Tomatoes", price: 35, unit: "kg", category: "Vegetables", inStock: true, rating: 4.2 },
-  { id: 8, name: "Milk", price: 50, unit: "L", category: "Dairy", inStock: true, rating: 4.6 },
-  { id: 9, name: "Eggs", price: 6, unit: "piece", category: "Dairy", inStock: true, rating: 4.3 },
-  { id: 10, name: "Bread", price: 25, unit: "loaf", category: "Bakery", inStock: true, rating: 4.1 },
-  { id: 11, name: "Sugar", price: 42, unit: "kg", category: "Essentials", inStock: true, rating: 4.2 },
-  { id: 12, name: "Salt", price: 18, unit: "kg", category: "Essentials", inStock: true, rating: 4.4 },
+  { id: 1, name: "Basmati Rice", price: 120, unit: "kg", category: "Grains", inStock: true, rating: 4.5, availableUnits: ["kg", "gram"] },
+  { id: 2, name: "Whole Wheat Flour", price: 45, unit: "kg", category: "Grains", inStock: true, rating: 4.3, availableUnits: ["kg", "gram"] },
+  { id: 3, name: "Toor Dal", price: 85, unit: "kg", category: "Pulses", inStock: true, rating: 4.4, availableUnits: ["kg", "gram"] },
+  { id: 4, name: "Refined Oil", price: 110, unit: "L", category: "Oils", inStock: true, rating: 4.2, availableUnits: ["L", "ml"] },
+  { id: 5, name: "Onions", price: 25, unit: "kg", category: "Vegetables", inStock: true, rating: 4.1, availableUnits: ["kg", "gram"] },
+  { id: 6, name: "Potatoes", price: 20, unit: "kg", category: "Vegetables", inStock: true, rating: 4.0, availableUnits: ["kg", "gram"] },
+  { id: 7, name: "Tomatoes", price: 35, unit: "kg", category: "Vegetables", inStock: true, rating: 4.2, availableUnits: ["kg", "gram"] },
+  { id: 8, name: "Milk", price: 50, unit: "L", category: "Dairy", inStock: true, rating: 4.6, availableUnits: ["L", "ml"] },
+  { id: 9, name: "Eggs", price: 6, unit: "piece", category: "Dairy", inStock: true, rating: 4.3, availableUnits: ["piece"] },
+  { id: 10, name: "Bread", price: 25, unit: "loaf", category: "Bakery", inStock: true, rating: 4.1, availableUnits: ["loaf"] },
+  { id: 11, name: "Sugar", price: 42, unit: "kg", category: "Essentials", inStock: true, rating: 4.2, availableUnits: ["kg", "gram"] },
+  { id: 12, name: "Salt", price: 18, unit: "kg", category: "Essentials", inStock: true, rating: 4.4, availableUnits: ["kg", "gram"] },
 ];
 
 const Index = () => {
@@ -50,18 +61,18 @@ const Index = () => {
     ? products 
     : products.filter(p => p.category === selectedCategory);
 
-  const updateQuantity = (product: Product, quantity: number) => {
-    if (quantity === 0) {
+  const updateQuantity = (product: Product, quantity: number, selectedUnit: string) => {
+    if (quantity === 0 || isNaN(quantity)) {
       setOrderItems(prev => prev.filter(item => item.product.id !== product.id));
     } else {
       setOrderItems(prev => {
         const existingItem = prev.find(item => item.product.id === product.id);
         if (existingItem) {
           return prev.map(item =>
-            item.product.id === product.id ? { ...item, quantity } : item
+            item.product.id === product.id ? { ...item, quantity, selectedUnit } : item
           );
         } else {
-          return [...prev, { product, quantity }];
+          return [...prev, { product, quantity, selectedUnit }];
         }
       });
     }
@@ -71,8 +82,29 @@ const Index = () => {
     return orderItems.find(item => item.product.id === productId)?.quantity || 0;
   };
 
+  const getItemUnit = (productId: number) => {
+    return orderItems.find(item => item.product.id === productId)?.selectedUnit || products.find(p => p.id === productId)?.unit || '';
+  };
+
+  const calculateItemPrice = (product: Product, quantity: number, selectedUnit: string) => {
+    const basePrice = product.price;
+    const baseUnit = product.unit;
+    
+    // If units are the same, no conversion needed
+    if (baseUnit === selectedUnit) {
+      return basePrice * quantity;
+    }
+    
+    // Convert price based on unit
+    const conversionFactor = unitConversions[selectedUnit] / unitConversions[baseUnit];
+    const pricePerSelectedUnit = basePrice / conversionFactor;
+    return pricePerSelectedUnit * quantity;
+  };
+
   const getTotalAmount = () => {
-    return orderItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
+    return orderItems.reduce((total, item) => 
+      total + calculateItemPrice(item.product, item.quantity, item.selectedUnit), 0
+    );
   };
 
   const handlePlaceOrder = () => {
@@ -95,10 +127,18 @@ const Index = () => {
     }
 
     const orderText = `🛒 *New Order from ${customerName}*\n\n` +
-      orderItems.map(item => 
-        `• ${item.product.name} - ${item.quantity} ${item.product.unit} @ ₹${item.product.price}/${item.product.unit} = ₹${item.product.price * item.quantity}`
-      ).join('\n') +
-      `\n\n*Total Amount: ₹${getTotalAmount()}*\n\n` +
+      orderItems.map(item => {
+        const totalPrice = calculateItemPrice(item.product, item.quantity, item.selectedUnit);
+        const basePrice = item.product.price;
+        const baseUnit = item.product.unit;
+        
+        // Calculate price per selected unit
+        const conversionFactor = unitConversions[item.selectedUnit] / unitConversions[baseUnit];
+        const pricePerSelectedUnit = basePrice / conversionFactor;
+        
+        return `• ${item.product.name} - ${item.quantity} ${item.selectedUnit} @ ₹${pricePerSelectedUnit.toFixed(2)}/${item.selectedUnit} = ₹${totalPrice.toFixed(2)}`;
+      }).join('\n') +
+      `\n\n*Total Amount: ₹${getTotalAmount().toFixed(2)}*\n\n` +
       `Please confirm the order and let me know the delivery time.\n\n` +
       `Customer: ${customerName}`;
 
@@ -192,30 +232,60 @@ const Index = () => {
                   <span className="text-sm text-muted-foreground">/{product.unit}</span>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(product, Math.max(0, getItemQuantity(product.id) - 1))}
-                      disabled={getItemQuantity(product.id) === 0}
-                    >
-                      <Minus className="w-4 h-4" />
-                    </Button>
-                    <span className="w-8 text-center font-medium">
-                      {getItemQuantity(product.id)}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => updateQuantity(product, getItemQuantity(product.id) + 1)}
-                    >
-                      <Plus className="w-4 h-4" />
-                    </Button>
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium mb-1">Quantity</label>
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.1"
+                        placeholder="0"
+                        value={getItemQuantity(product.id) || ''}
+                        onChange={(e) => {
+                          const quantity = parseFloat(e.target.value) || 0;
+                          const selectedUnit = getItemUnit(product.id);
+                          updateQuantity(product, quantity, selectedUnit);
+                        }}
+                        className="w-full"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-xs font-medium mb-1">Unit</label>
+                      <Select 
+                        value={getItemUnit(product.id)} 
+                        onValueChange={(value) => {
+                          const quantity = getItemQuantity(product.id);
+                          if (quantity > 0) {
+                            updateQuantity(product, quantity, value);
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select unit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {product.availableUnits.map(unit => (
+                            <SelectItem key={unit} value={unit}>{unit}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                  <Badge variant={product.inStock ? "default" : "destructive"}>
-                    {product.inStock ? "In Stock" : "Out of Stock"}
-                  </Badge>
+                  
+                  <div className="flex justify-between items-center">
+                    <Badge variant={product.inStock ? "default" : "destructive"}>
+                      {product.inStock ? "In Stock" : "Out of Stock"}
+                    </Badge>
+                    
+                    {getItemQuantity(product.id) > 0 && (
+                      <div className="text-sm">
+                        <span className="font-medium text-primary">
+                          Total: ₹{calculateItemPrice(product, getItemQuantity(product.id), getItemUnit(product.id)).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -232,15 +302,15 @@ const Index = () => {
               <div className="space-y-2 mb-4">
                 {orderItems.map(item => (
                   <div key={item.product.id} className="flex justify-between items-center">
-                    <span>{item.product.name} x {item.quantity} {item.product.unit}</span>
-                    <span className="font-medium">₹{item.product.price * item.quantity}</span>
+                    <span>{item.product.name} x {item.quantity} {item.selectedUnit}</span>
+                    <span className="font-medium">₹{calculateItemPrice(item.product, item.quantity, item.selectedUnit).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <Separator className="my-4" />
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total Amount:</span>
-                <span className="text-primary">₹{getTotalAmount()}</span>
+                <span className="text-primary">₹{getTotalAmount().toFixed(2)}</span>
               </div>
               <Button 
                 onClick={handlePlaceOrder}
