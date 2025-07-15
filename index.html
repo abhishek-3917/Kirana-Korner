@@ -1,24 +1,519 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>kirana-quick-order-site</title>
-    <meta name="description" content="Lovable Generated Project" />
-    <meta name="author" content="Lovable" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharma Ji's Kirana Store</title>
+    <meta name="description" content="Your neighborhood grocery store with fresh, quality, and affordable products">
+    <meta name="author" content="Sharma Ji's Kirana Store">
+    
+    <meta property="og:title" content="Sharma Ji's Kirana Store">
+    <meta property="og:description" content="Fresh • Quality • Affordable - Your neighborhood grocery store">
+    <meta property="og:type" content="website">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: 'hsl(158, 64%, 35%)',
+                        'primary-foreground': 'hsl(0, 0%, 100%)',
+                        secondary: 'hsl(25, 95%, 53%)',
+                        'secondary-foreground': 'hsl(0, 0%, 100%)',
+                        background: 'hsl(48, 100%, 97%)',
+                        foreground: 'hsl(158, 64%, 12%)',
+                        card: 'hsl(0, 0%, 100%)',
+                        'card-foreground': 'hsl(158, 64%, 12%)',
+                        muted: 'hsl(45, 100%, 96%)',
+                        'muted-foreground': 'hsl(158, 25%, 35%)',
+                        border: 'hsl(158, 25%, 90%)',
+                        accent: 'hsl(158, 45%, 85%)',
+                        destructive: 'hsl(0, 84.2%, 60.2%)',
+                        'destructive-foreground': 'hsl(0, 0%, 100%)',
+                    },
+                    backgroundImage: {
+                        'hero-gradient': 'linear-gradient(135deg, hsl(158, 64%, 35%), hsl(158, 45%, 50%))',
+                        'fresh-gradient': 'linear-gradient(135deg, hsl(158, 64%, 35%), hsl(158, 45%, 50%))',
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.95)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .shadow-card {
+            box-shadow: 0 4px 20px hsla(158, 45%, 15%, 0.1);
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            color: white;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast.success {
+            background-color: hsl(158, 64%, 35%);
+        }
+        .toast.error {
+            background-color: hsl(0, 84.2%, 60.2%);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-background text-foreground">
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
-    <meta property="og:title" content="kirana-quick-order-site" />
-    <meta property="og:description" content="Lovable Generated Project" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <!-- Hero Section -->
+    <div class="relative h-[500px] bg-hero-gradient flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-cover bg-center opacity-20" style="background-image: url('src/assets/kirana-hero.jpg')"></div>
+        <div class="relative z-10 text-center text-white animate-fade-in">
+            <h1 class="text-5xl md:text-6xl font-bold mb-4">
+                Sharma Ji's <span class="text-secondary">Kirana Store</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-6">Fresh • Quality • Affordable</p>
+            <p class="text-lg opacity-90">Your neighborhood grocery store with the best prices</p>
+        </div>
+    </div>
 
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
-  </head>
+    <div class="container mx-auto px-4 py-12 max-w-7xl">
+        <!-- Order Form -->
+        <div class="mb-8 shadow-card animate-scale-in bg-card rounded-lg border border-border">
+            <div class="p-6 border-b border-border">
+                <h2 class="text-2xl font-bold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                        <circle cx="8" cy="21" r="1"/>
+                        <circle cx="19" cy="21" r="1"/>
+                        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+                    </svg>
+                    Place Your Order
+                </h2>
+                <p class="text-muted-foreground mt-2">Enter your details and select items to place an order</p>
+            </div>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Your Name</label>
+                        <input
+                            type="text"
+                            id="customerName"
+                            placeholder="Enter your full name"
+                            class="w-full px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Delivery Address</label>
+                        <input
+                            type="text"
+                            id="customerAddress"
+                            placeholder="Enter your complete address"
+                            class="w-full px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+        <!-- Category Filter -->
+        <div class="mb-8">
+            <div class="flex flex-wrap gap-2" id="categoryFilter">
+                <!-- Categories will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Products Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8" id="productsGrid">
+            <!-- Products will be populated by JavaScript -->
+        </div>
+
+        <!-- Order Summary -->
+        <div id="orderSummary" class="mb-8 shadow-card animate-scale-in bg-card rounded-lg border border-border hidden">
+            <div class="p-6 border-b border-border">
+                <h2 class="text-2xl font-bold">Order Summary</h2>
+            </div>
+            <div class="p-6">
+                <div class="space-y-2 mb-4" id="orderItems">
+                    <!-- Order items will be populated by JavaScript -->
+                </div>
+                <hr class="my-4 border-border">
+                <div class="flex justify-between items-center text-lg font-bold">
+                    <span>Total Amount:</span>
+                    <span class="text-primary" id="totalAmount">₹0.00</span>
+                </div>
+                <button 
+                    id="placeOrderBtn"
+                    class="w-full mt-4 bg-fresh-gradient hover:opacity-90 text-white py-3 px-6 rounded-md font-medium text-lg transition-opacity"
+                >
+                    Place Order via WhatsApp
+                </button>
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="shadow-card animate-fade-in bg-card rounded-lg border border-border">
+                <div class="p-6 border-b border-border">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Store Address
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <p class="text-muted-foreground">
+                        Shop No. 15, Green Market Complex<br>
+                        Sector 21, Dwarka<br>
+                        New Delhi - 110075
+                    </p>
+                </div>
+            </div>
+
+            <div class="shadow-card animate-fade-in bg-card rounded-lg border border-border">
+                <div class="p-6 border-b border-border">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                        </svg>
+                        Contact Details
+                    </h2>
+                </div>
+                <div class="p-6">
+                    <div class="space-y-2">
+                        <p class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                            +91 98765 43210
+                        </p>
+                        <p class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12,6 12,12 16,14"/>
+                            </svg>
+                            Open: 7:00 AM - 10:00 PM
+                        </p>
+                        <p class="text-muted-foreground">Daily</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data and functionality
+        const products = [
+            { id: 1, name: "Basmati Rice", price: 120, unit: "kg", category: "Grains", inStock: true, rating: 4.5, availableUnits: ["kg", "gram"] },
+            { id: 2, name: "Whole Wheat Flour", price: 45, unit: "kg", category: "Grains", inStock: true, rating: 4.3, availableUnits: ["kg", "gram"] },
+            { id: 3, name: "Toor Dal", price: 85, unit: "kg", category: "Pulses", inStock: true, rating: 4.4, availableUnits: ["kg", "gram"] },
+            { id: 4, name: "Refined Oil", price: 110, unit: "L", category: "Oils", inStock: true, rating: 4.2, availableUnits: ["L", "ml"] },
+            { id: 5, name: "Onions", price: 25, unit: "kg", category: "Vegetables", inStock: true, rating: 4.1, availableUnits: ["kg", "gram"] },
+            { id: 6, name: "Potatoes", price: 20, unit: "kg", category: "Vegetables", inStock: true, rating: 4.0, availableUnits: ["kg", "gram"] },
+            { id: 7, name: "Tomatoes", price: 35, unit: "kg", category: "Vegetables", inStock: true, rating: 4.2, availableUnits: ["kg", "gram"] },
+            { id: 8, name: "Milk", price: 50, unit: "L", category: "Dairy", inStock: true, rating: 4.6, availableUnits: ["L", "ml"] },
+            { id: 9, name: "Eggs", price: 6, unit: "piece", category: "Dairy", inStock: true, rating: 4.3, availableUnits: ["piece"] },
+            { id: 10, name: "Bread", price: 25, unit: "loaf", category: "Bakery", inStock: true, rating: 4.1, availableUnits: ["loaf"] },
+            { id: 11, name: "Sugar", price: 42, unit: "kg", category: "Essentials", inStock: true, rating: 4.2, availableUnits: ["kg", "gram"] },
+            { id: 12, name: "Salt", price: 18, unit: "kg", category: "Essentials", inStock: true, rating: 4.4, availableUnits: ["kg", "gram"] },
+        ];
+
+        const unitConversions = {
+            'kg': 1,
+            'gram': 1000,
+            'L': 1,
+            'ml': 1000
+        };
+
+        let orderItems = [];
+        let selectedCategory = 'All';
+
+        // Toast functionality
+        function showToast(title, description, variant = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${variant}`;
+            toast.innerHTML = `
+                <div class="font-semibold">${title}</div>
+                <div class="text-sm opacity-90">${description}</div>
+            `;
+            
+            document.getElementById('toast-container').appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Calculate item price with unit conversion
+        function calculateItemPrice(product, quantity, selectedUnit) {
+            const basePrice = product.price;
+            const baseUnit = product.unit;
+            
+            if (baseUnit === selectedUnit) {
+                return basePrice * quantity;
+            }
+            
+            const conversionFactor = unitConversions[selectedUnit] / unitConversions[baseUnit];
+            const pricePerSelectedUnit = basePrice / conversionFactor;
+            return pricePerSelectedUnit * quantity;
+        }
+
+        // Update quantity for a product
+        function updateQuantity(product, quantity, selectedUnit) {
+            if (quantity === 0 || isNaN(quantity)) {
+                orderItems = orderItems.filter(item => item.product.id !== product.id);
+            } else {
+                const existingItem = orderItems.find(item => item.product.id === product.id);
+                if (existingItem) {
+                    existingItem.quantity = quantity;
+                    existingItem.selectedUnit = selectedUnit;
+                } else {
+                    orderItems.push({ product, quantity, selectedUnit });
+                }
+            }
+            updateOrderSummary();
+        }
+
+        // Get item quantity
+        function getItemQuantity(productId) {
+            return orderItems.find(item => item.product.id === productId)?.quantity || 0;
+        }
+
+        // Get item unit
+        function getItemUnit(productId) {
+            return orderItems.find(item => item.product.id === productId)?.selectedUnit || 
+                   products.find(p => p.id === productId)?.unit || '';
+        }
+
+        // Calculate total amount
+        function getTotalAmount() {
+            return orderItems.reduce((total, item) => 
+                total + calculateItemPrice(item.product, item.quantity, item.selectedUnit), 0
+            );
+        }
+
+        // Render categories
+        function renderCategories() {
+            const categories = ['All', ...Array.from(new Set(products.map(p => p.category)))];
+            const categoryFilter = document.getElementById('categoryFilter');
+            
+            categoryFilter.innerHTML = categories.map(category => `
+                <span 
+                    class="px-3 py-1 rounded-full text-sm font-medium cursor-pointer transition-colors ${
+                        selectedCategory === category 
+                            ? 'bg-primary text-primary-foreground' 
+                            : 'bg-accent text-accent-foreground hover:bg-primary hover:text-primary-foreground'
+                    }"
+                    onclick="setCategory('${category}')"
+                >
+                    ${category}
+                </span>
+            `).join('');
+        }
+
+        // Set category
+        function setCategory(category) {
+            selectedCategory = category;
+            renderCategories();
+            renderProducts();
+        }
+
+        // Render products
+        function renderProducts() {
+            const filteredProducts = selectedCategory === 'All' 
+                ? products 
+                : products.filter(p => p.category === selectedCategory);
+            
+            const productsGrid = document.getElementById('productsGrid');
+            
+            productsGrid.innerHTML = filteredProducts.map(product => `
+                <div class="hover:shadow-lg transition-shadow animate-fade-in bg-card rounded-lg border border-border">
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-lg">${product.name}</h3>
+                            <span class="px-2 py-1 bg-accent text-accent-foreground rounded text-xs">
+                                ${product.category}
+                            </span>
+                        </div>
+                        
+                        <div class="flex items-center gap-2 mb-3">
+                            <div class="flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400">
+                                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                                </svg>
+                                <span class="text-sm ml-1">${product.rating}</span>
+                            </div>
+                            <span class="text-2xl font-bold text-primary">₹${product.price}</span>
+                            <span class="text-sm text-muted-foreground">/${product.unit}</span>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium mb-1">Quantity</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.1"
+                                        placeholder="0"
+                                        value="${getItemQuantity(product.id) || ''}"
+                                        onchange="handleQuantityChange(${product.id}, this.value)"
+                                        class="w-full px-2 py-1 border border-border rounded text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                                    />
+                                </div>
+                                <div class="flex-1">
+                                    <label class="block text-xs font-medium mb-1">Unit</label>
+                                    <select 
+                                        onchange="handleUnitChange(${product.id}, this.value)"
+                                        class="w-full px-2 py-1 border border-border rounded text-sm bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                                    >
+                                        ${product.availableUnits.map(unit => `
+                                            <option value="${unit}" ${getItemUnit(product.id) === unit ? 'selected' : ''}>${unit}</option>
+                                        `).join('')}
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span class="px-2 py-1 rounded text-xs ${
+                                    product.inStock 
+                                        ? 'bg-primary text-primary-foreground' 
+                                        : 'bg-destructive text-destructive-foreground'
+                                }">
+                                    ${product.inStock ? "In Stock" : "Out of Stock"}
+                                </span>
+                                
+                                ${getItemQuantity(product.id) > 0 ? `
+                                    <div class="text-sm">
+                                        <span class="font-medium text-primary">
+                                            Total: ₹${calculateItemPrice(product, getItemQuantity(product.id), getItemUnit(product.id)).toFixed(2)}
+                                        </span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Handle quantity change
+        function handleQuantityChange(productId, value) {
+            const product = products.find(p => p.id === productId);
+            const quantity = parseFloat(value) || 0;
+            const selectedUnit = getItemUnit(productId);
+            updateQuantity(product, quantity, selectedUnit);
+        }
+
+        // Handle unit change
+        function handleUnitChange(productId, unit) {
+            const product = products.find(p => p.id === productId);
+            const quantity = getItemQuantity(productId);
+            if (quantity > 0) {
+                updateQuantity(product, quantity, unit);
+            }
+        }
+
+        // Update order summary
+        function updateOrderSummary() {
+            const orderSummary = document.getElementById('orderSummary');
+            const orderItemsContainer = document.getElementById('orderItems');
+            const totalAmountElement = document.getElementById('totalAmount');
+            
+            if (orderItems.length > 0) {
+                orderSummary.classList.remove('hidden');
+                
+                orderItemsContainer.innerHTML = orderItems.map(item => `
+                    <div class="flex justify-between items-center">
+                        <span>${item.product.name} x ${item.quantity} ${item.selectedUnit}</span>
+                        <span class="font-medium">₹${calculateItemPrice(item.product, item.quantity, item.selectedUnit).toFixed(2)}</span>
+                    </div>
+                `).join('');
+                
+                totalAmountElement.textContent = `₹${getTotalAmount().toFixed(2)}`;
+            } else {
+                orderSummary.classList.add('hidden');
+            }
+        }
+
+        // Handle place order
+        function handlePlaceOrder() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const customerAddress = document.getElementById('customerAddress').value.trim();
+            
+            if (!customerName) {
+                showToast("Please enter your name", "We need your name to process the order.", "error");
+                return;
+            }
+
+            if (!customerAddress) {
+                showToast("Please enter your address", "We need your delivery address to process the order.", "error");
+                return;
+            }
+
+            if (orderItems.length === 0) {
+                showToast("No items selected", "Please add some items to your order.", "error");
+                return;
+            }
+
+            const orderText = `🛒 *New Order from ${customerName}*\n\n` +
+                orderItems.map(item => {
+                    const totalPrice = calculateItemPrice(item.product, item.quantity, item.selectedUnit);
+                    const basePrice = item.product.price;
+                    const baseUnit = item.product.unit;
+                    
+                    const conversionFactor = unitConversions[item.selectedUnit] / unitConversions[baseUnit];
+                    const pricePerSelectedUnit = basePrice / conversionFactor;
+                    
+                    return `• ${item.product.name} - ${item.quantity} ${item.selectedUnit} @ ₹${pricePerSelectedUnit.toFixed(2)}/${item.selectedUnit} = ₹${totalPrice.toFixed(2)}`;
+                }).join('\n') +
+                `\n\n*Total Amount: ₹${getTotalAmount().toFixed(2)}*\n\n` +
+                `📍 *Delivery Address:*\n${customerAddress}\n\n` +
+                `Please confirm the order and let me know the delivery time.\n\n` +
+                `Customer: ${customerName}`;
+
+            const whatsappUrl = `https://wa.me/919876543210?text=${encodeURIComponent(orderText)}`;
+            window.open(whatsappUrl, '_blank');
+
+            showToast("Order placed successfully!", "You will be redirected to WhatsApp to confirm your order.");
+        }
+
+        // Initialize the app
+        function init() {
+            renderCategories();
+            renderProducts();
+            
+            // Add event listener for place order button
+            document.getElementById('placeOrderBtn').addEventListener('click', handlePlaceOrder);
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
 </html>
