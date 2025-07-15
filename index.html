@@ -285,6 +285,7 @@
 
         // Update quantity for a product
         function updateQuantity(product, quantity, selectedUnit) {
+            console.log('updateQuantity called:', product.name, quantity, selectedUnit);
             if (quantity === 0 || isNaN(quantity)) {
                 orderItems = orderItems.filter(item => item.product.id !== product.id);
             } else {
@@ -296,7 +297,9 @@
                     orderItems.push({ product, quantity, selectedUnit });
                 }
             }
+            console.log('Current order items:', orderItems);
             updateOrderSummary();
+            renderProducts(); // Re-render products to show updated prices
         }
 
         // Get item quantity
