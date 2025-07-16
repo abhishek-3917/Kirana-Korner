@@ -165,21 +165,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation - Fixed positioning to ensure visibility */}
-      <div className="fixed top-4 right-4 z-50">
-        <Link to="/admin">
-          <Button 
-            variant="default" 
-            size="lg" 
-            className="bg-blue-600 text-white hover:bg-blue-700 shadow-xl border-2 border-white"
-            onClick={() => console.log("Admin button clicked!")}
-          >
-            <Settings className="w-5 h-5 mr-2" />
-            Go to Admin
-          </Button>
-        </Link>
-      </div>
-
       {/* Hero Section */}
       <div className="relative h-[500px] bg-hero-gradient flex items-center justify-center overflow-hidden">
         <div 
@@ -360,7 +345,7 @@ const Index = () => {
         )}
 
         {/* Contact Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="shadow-card animate-fade-in">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -398,6 +383,21 @@ const Index = () => {
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        {/* Admin Button at Bottom */}
+        <div className="flex justify-center">
+          <Link to="/admin">
+            <Button 
+              variant="default" 
+              size="lg" 
+              className="bg-blue-600 text-white hover:bg-blue-700 shadow-xl border-2 border-white"
+              onClick={() => console.log("Admin button clicked!")}
+            >
+              <Settings className="w-5 h-5 mr-2" />
+              Go to Admin
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
