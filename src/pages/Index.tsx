@@ -168,7 +168,7 @@ const Index = () => {
       {/* Navigation */}
       <nav className="absolute top-4 right-4 z-20">
         <Link to="/admin">
-          <Button variant="outline" size="sm" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+          <Button variant="default" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg">
             <Settings className="w-4 h-4 mr-2" />
             Admin
           </Button>
