@@ -5,8 +5,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ShoppingCart, Phone, MapPin, Clock, Star } from 'lucide-react';
+import { ShoppingCart, Phone, MapPin, Clock, Star, Settings } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/kirana-hero.jpg";
 
 interface Product {
@@ -164,6 +165,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Navigation */}
+      <nav className="absolute top-4 right-4 z-20">
+        <Link to="/admin">
+          <Button variant="outline" size="sm" className="bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/20">
+            <Settings className="w-4 h-4 mr-2" />
+            Admin
+          </Button>
+        </Link>
+      </nav>
+
       {/* Hero Section */}
       <div className="relative h-[500px] bg-hero-gradient flex items-center justify-center overflow-hidden">
         <div 
